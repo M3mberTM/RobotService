@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="content-type"
+	content="application/xhtml+xml; charset=UTF-8" />
+<title>Hello App Engine</title>
+</head>
+
+<body onload='onLoad();'>
+	<script>
+	
+		function onLoad() {
+			readLego();
+			readAllValues();
+		}
+	
+	
+		function readLego() {
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var lego = JSON.parse(this.responseText);
+					document.getElementById("lego").innerHTML = "Id=" + lego.id
+							+ "<br>Name=" + lego.name;
+					document.getElementById("legoid").value = lego.id;
+
+				}
+			};
+
+			xhttp.open("GET", "/rest/lego/getlego", true);
+			xhttp.send();
+		}
+		
+		function readAllValues() {
+			console.log("Read all values");
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var lego = JSON.parse(this.responseText);
+					console.log(lego);
+					var table = document.getElementById("logs");
+					var tbody = table.getElementsByTagName("tbody")[0];
+					tbody.innerHTML = "";
+					for (let i = 0; i < lego.length; i++) {
+						var item = lego[i];
+						var newRow = document.createElement("tr");
+					      newRow.innerHTML = "<td>" + item.id + "</td><td>" + item.maxspeed + "</td>" + "</td><td>" + item.turningPercentage + "</td><td>" + item.lowerThresh + "</td><td>" + item.upperThresh + "</td><td>" + item.time + "</td>";
+					      tbody.appendChild(newRow);
+						
+					}
+					
+
+				}
+			};
+
+			xhttp.open("GET", "/rest/lego/getallvalues", true);
+			xhttp.send();
+		}
+		
+		
+		
+		
+		function sendData(form) {
+
+			//Create a new Javascript object
+			var legoSetting = new Object();
+			legoSetting.maxspeed = form.speed.value;
+			var lego = new Object();
+			lego.id = form.legoid.value;
+			legoSetting.lego = lego;
+			legoSetting.turningPercentage = form.turningPercentage.value;
+			legoSetting.lowerThresh = form.lowerThresh.value;
+			legoSetting.upperThresh = form.upperThresh.value;
+
+			var json = JSON.stringify(legoSetting);
+			var xhttp = new XMLHttpRequest();
+
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var settings = JSON.parse(this.responseText);
+					console.log("ID="
+							+ settings.id + " Speed=" + settings.maxspeed
+							+ "Turning Percentage="
+							+ settings.turningPercentage + " Lower Threshold="
+							+ settings.lowerThresh + "Upper threshold="
+							+ settings.upperThresh);
+				}
+			};
+
+			xhttp.open("POST", "/rest/lego/setvalues", true);
+			xhttp.setRequestHeader("Content-type", "application/json");
+			xhttp.send(json);
+
+			readAllValues();
+			
+		}
+	</script>
+	<h1>Lego Settings!</h1>
+	<h3>Lego</h3>
+	<p id='lego'></p>
+	<h3>New values</h3>
+	<form>
+		Id: <input id='legoid' type='text' name='legoid' value=''><br>
+		Max Speed: <input type='text' name='speed' value='200'><br>
+		Turning percentage: <input type='text' name='turningPercentage'value='0.3'><br> 
+		Lower Threshold: <input type='text' name='lowerThresh' value='0.7'><br> 
+		Upper threshold: <input type='text' name='upperThresh' value='0.8'><br> 
+		<input type='button' name='ok' value='OK' onclick='sendData(this.form);'>
+	</form>
+
+	<table id='logs'>
+	<thead>
+  <tr>
+    <th>Id</th>
+    <th>Max speed</th>
+    <th>Turning percentage</th>
+    <th>Lower thresh</th>
+    <th>Upper thresh</th>
+    <th>Time</th>
+  </tr>
+	</thead>
+	<tbody>
+	
+	</tbody>
+	
+</body>
+</html>
