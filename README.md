@@ -6,9 +6,9 @@ This repository contains the source code for our Java RESTful web service design
 
 * Hongqian Li - Initial work - [HongqianLi](https://github.com/hongqian-li)
 * Richard Švajdlenka - Database Integration - [Richard](https://github.com/M3mberTM)
-* Julian Hack - System Testing - [JulianHack](https://github.com/Julian23000)
+* Julian Hack - Researcher and Debugger - [JulianHack](https://github.com/Julian23000)
 * Attila Vegh - Backend Development - [AttilaVegh](https://github.com/Attila22000)
 
 
 ### Hongqian Li
-Main responsibilities include ensuring the continuity and integration of content from the previous robotics project, facilitating team meetings, managing Jira and Confluence, and providing code and testing support to the team to complete basic initial work.
+I was mainly in charge of making sure everything we did before was properly linked up with what we’re working on now. I helped organize our meetings to keep everyone on the same page and took care of managing our Jira and Confluence setups to track our progress and documentation. My role also involved supporting the team with coding and testing, making sure we got the groundwork done right from the start.
