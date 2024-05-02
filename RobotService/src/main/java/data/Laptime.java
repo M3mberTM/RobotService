@@ -14,35 +14,20 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name="lego")
-public class Lego {
+@Table(name="laptime")
+public class Laptime {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	private String name="";
-
-	@OneToMany(mappedBy="lego", fetch=FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@JsonManagedReference //To handle converting object to JSON and backwards
-	private List<LegoSetting> legoSetting;
+	private int timetaken;
 	
-	public List<LegoSetting> getLegoSetting() {
-		return legoSetting;
-	}
-	public void setLegoSetting(List<LegoSetting> legoSetting) {
-		this.legoSetting = legoSetting;
-	}
-	
-	
-	
-	
-	
-	public Lego() {
+	public Laptime() {
 		super();
 	}
-	public Lego(int id, String name) {
+	public Laptime(int id, int timetaken) {
 		super();
 		this.id = id;
-		this.name = name;
+		this.timetaken = timetaken;
 	}
 	public int getId() {
 		return id;
@@ -50,15 +35,15 @@ public class Lego {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getName() {
-		return name;
+	public int getTimetaken() {
+		return timetaken;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setTimetaken(int timetaken) {
+		this.timetaken= timetaken;
 	}
 	@Override
 	public String toString() {
-		return id+"#"+name;
+		return id+"#"+timetaken;
 	}
 	
 }

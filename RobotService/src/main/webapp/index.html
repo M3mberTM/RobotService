@@ -3,22 +3,79 @@
 <head>
 <meta http-equiv="content-type"
 	content="application/xhtml+xml; charset=UTF-8" />
+	<meta http-equiv="refresh" content="30"/>
 <title>Hello App Engine</title>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
 </head>
 <style>
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 
-
+body {
+	width: 98%;
+}
 </style>
-
 <body onload='onLoad();'>
 	<script>
-	
 		function onLoad() {
 			readLego();
 			readAllValues();
+			showKillswitchStatus();
+			getTimestamps();
 		}
-	
-	
+
+		function test(form) {
+			var checkBox = form.killswitch;
+
+			console.log(checkBox.checked);
+		}
+
+		function setKillswitch(form) {
+			//Create a new Javascript object
+			var Killswitch = new Object();
+			var checkBox = form.killswitch;
+			Killswitch.killswitch = checkBox.checked == true ? 1 : 0;
+
+			var json = JSON.stringify(Killswitch);
+			var xhttp = new XMLHttpRequest();
+			console.log(json);
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var settings = JSON.parse(this.responseText);
+					console.log(settings);
+
+				}
+			};
+
+			xhttp.open("POST", "/rest/lego/setkill", true);
+			xhttp.setRequestHeader("Content-type", "application/json");
+			xhttp.send(json);
+		}
+
+		function showKillswitchStatus() {
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var killswitch = JSON.parse(this.responseText);
+					console.log(killswitch);
+					document.getElementById("killswitchstatus").innerHTML = killswitch == "1" ? "Killswitch: On"
+							: "Killswitch: Off";
+
+				}
+			};
+
+			xhttp.open("GET", "/rest/lego/getkill", true);
+			xhttp.send();
+		}
+
 		function readLego() {
 			var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function() {
@@ -34,25 +91,29 @@
 			xhttp.open("GET", "/rest/lego/getlego", true);
 			xhttp.send();
 		}
-		
+
 		function readAllValues() {
 			console.log("Read all values");
 			var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
 					var lego = JSON.parse(this.responseText);
-					console.log(lego);
+					//console.log(lego);
 					var table = document.getElementById("logs");
 					var tbody = table.getElementsByTagName("tbody")[0];
 					tbody.innerHTML = "";
 					for (let i = 0; i < lego.length; i++) {
 						var item = lego[i];
 						var newRow = document.createElement("tr");
-					      newRow.innerHTML = "<td>" + item.id + "</td><td>" + item.maxspeed + "</td>" + "</td><td>" + item.turningPercentage + "</td><td>" + item.lowerThresh + "</td><td>" + item.upperThresh + "</td><td>" + item.time + "</td>";
-					      tbody.appendChild(newRow);
-						
+						newRow.innerHTML = "<td>" + item.id + "</td><td>"
+								+ item.maxspeed + "</td>" + "</td><td>"
+								+ item.turningPercentage + "</td><td>"
+								+ item.lowerThresh + "</td><td>"
+								+ item.upperThresh + "</td><td>" + item.time
+								+ "</td>";
+						tbody.appendChild(newRow);
+
 					}
-					
 
 				}
 			};
@@ -63,7 +124,7 @@
 		
 		
 		
-		
+
 		function sendData(form) {
 
 			//Create a new Javascript object
@@ -76,18 +137,21 @@
 			legoSetting.lowerThresh = form.lowerThresh.value;
 			legoSetting.upperThresh = form.upperThresh.value;
 
+			console.log(legoSetting.upperThresh);
 			var json = JSON.stringify(legoSetting);
 			var xhttp = new XMLHttpRequest();
+
+			console.log(json);
 
 			xhttp.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
 					var settings = JSON.parse(this.responseText);
-					console.log("ID="
-							+ settings.id + " Speed=" + settings.maxspeed
-							+ "Turning Percentage="
+					console.log("ID=" + settings.id + " Speed="
+							+ settings.maxspeed + "Turning Percentage="
 							+ settings.turningPercentage + " Lower Threshold="
 							+ settings.lowerThresh + "Upper threshold="
 							+ settings.upperThresh);
+					readAllValues();
 				}
 			};
 
@@ -95,37 +159,200 @@
 			xhttp.setRequestHeader("Content-type", "application/json");
 			xhttp.send(json);
 
-			readAllValues();
+		}
+
+		function getTimestamps() {
+			console.log("Getting timestamps");
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					console.log(this.responseText);
+					var timestamps = JSON.parse(this.responseText);
+					
+					var table = document.getElementById("timestampstable");
+					var tbody = table.getElementsByTagName("tbody")[0];
+					tbody.innerHTML = "";
+					
+					for (let i = 1; i < timestamps.length; i++) {
+						
+						var newTimestamp = timestamps[i].timetaken;
+						var oldTimestamp = timestamps[i-1].timetaken;
+						var timeTaken = oldTimestamp - newTimestamp;
+					
+						var newRow = document.createElement("tr");
+						newRow.innerHTML = "<td>" + i + "</td><td>"
+								+ msToTime(timeTaken) + "</td>" + "</td>";
+						tbody.appendChild(newRow);
+
+					}
+					
+					
+					
+
+				}
+			};
+
+			xhttp.open("GET", "/rest/lego/gettimestamps", true);
+			xhttp.send();
+		}
+
+		function msToTime(s) {
+			  var ms = s % 1000;
+			  s = (s - ms) / 1000;
+			  var secs = s % 60;
+			  s = (s - secs) / 60;
+			  var mins = s;
+
 			
+			  return mins + ':' + secs + '.' + ms;
+			}
+		
+		
+		function getAllValues() {
+			var table = document.getElementById("logs");
+			var tbody = table.getElementsByTagName("tbody")[0];
+			var children = tbody.children;
+
+			var data = [];
+			for (let i = 0; i < children.length; i++) {
+				data.push(Number(children[i].children[1].innerHTML));
+			}
+			//console.log(data);
+			return data;
+		}
+
+		function drawChart() {
+			const data = getAllValues();
+			let dataSum = 0;
+			let avgSpeed = 0;
+			console.log(data);
+			let xValues = [];
+			let yValues = [];
+
+			for (let i = 0; i < data.length; i++) {
+				xValues.push(i);
+				yValues.push(data[i]);
+				dataSum = dataSum + data[i];
+			}
+			avgSpeed = dataSum / data.length;
+			avgSpeed = (Math.round(avgSpeed * 100) / 100).toFixed(2);
+			//console.log(xValues);
+			//console.log(yValues);
+
+			new Chart("linePlot", {
+				type : "line",
+				data : {
+					labels : xValues,
+					datasets : [ {
+						fill : false,
+						lineTension : 0,
+						backgroundColor : "rgba(255,0,0,1.0)",
+						borderColor : "rgba(255,0,0,0.1)",
+						data : yValues
+					} ]
+				},
+				options : {
+					legend : {
+						display : false
+					},
+					scales : {
+
+					}
+				}
+			});
+
+			document.getElementById("avgSpeed").innerHTML = "Avg speed:"
+					+ avgSpeed;
 		}
 	</script>
-	<h1>Lego Settings!</h1>
-	<h3>Lego</h3>
-	<p id='lego'></p>
-	<h3>New values</h3>
-	<form>
-		Id: <input id='legoid' type='text' name='legoid' value=''><br>
-		Max Speed: <input type='text' name='speed' value='200'><br>
-		Turning percentage: <input type='text' name='turningPercentage'value='0.3'><br> 
-		Lower Threshold: <input type='text' name='lowerThresh' value='0.7'><br> 
-		Upper threshold: <input type='text' name='upperThresh' value='0.8'><br> 
-		<input type='button' name='ok' value='OK' onclick='sendData(this.form);'>
-	</form>
+	<div class="row">
+		<div class="container">
+			<h1 style="text-align: center; margin-top: 2%; margin-bottom: 2%;">Lego
+				Settings!</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-5">
 
-	<table id='logs'>
-	<thead>
-  <tr>
-    <th>Id</th>
-    <th>Max speed</th>
-    <th>Turning percentage</th>
-    <th>Lower thresh</th>
-    <th>Upper thresh</th>
-    <th>Time</th>
-  </tr>
-	</thead>
-	<tbody>
-	
-	</tbody>
-	
+			<p id='lego' style="text-align: center;"></p>
+			<p id='killswitchstatus' style="text-align: center;">Current
+				Killswitch status:</p>
+			<h3 style="text-align: center;">Add new values</h3>
+			<br>
+			<div class="container">
+				<form class="form-group" style="text-align: center; width: 80%;">
+					Id: <input id='legoid' class="form-control" type='text'
+						name='legoid' value=''><br> Speed: <input type='text'
+						class="form-control" name='speed' value='200'><br>
+					Turning percentage: <input type='text' class="form-control"
+						name='turningPercentage' value='0.3'><br> Lower
+					Threshold: <input type='text' class="form-control"
+						name='lowerThresh' value='0.12'><br> Upper threshold:
+					<input type='text' class="form-control" name='upperThresh'
+						value='0.17'><br> <input type='button'
+						class="btn btn-light" name='ok' value='OK'
+						onclick='sendData(this.form);'> Killswitch <input
+						type='checkbox' class="btn btn-danger" name='killswitch'
+						onclick='setKillswitch(form);'> <br> <input
+						type='button' class="btn btn-light" name='killswitchBtn'
+						value='Show killswitch status' onclick='showKillswitchStatus();'>
+					<br> <input type='button' class="btn btn-light"
+						name='showTimestamps' value='Show Timestamps'
+						onclick='getTimestamps();'>
+
+
+				</form>
+			</div>
+			<div class="container">
+				<button onclick='drawChart()'>Calculate</button>
+				<br>
+
+				<canvas id="linePlot" style="width: 100%; max-width: 600px">
+	</canvas>
+				<br>
+				<p id="avgSpeed">Avg speed:</p>
+			</div>
+		</div>
+
+
+
+
+		<div class="col-sm-7">
+			<table class='table table-striped' id='logs'>
+				<thead>
+					<tr>
+						<th scope="col">#</th>
+						<th scope="col">Speed</th>
+						<th scope="col">Turning percentage</th>
+						<th scope="col">Lower thresh</th>
+						<th scope="col">Upper thresh</th>
+						<th scope="col">Time</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row"></th>
+					</tr>
+				</tbody>
+			</table>
+			<table class='table table-striped' id='timestampstable'>
+				<thead>
+					<tr>
+						<th scope="col">Lap number</th>
+						<th scope="col">Lap time</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row"></th>
+					</tr>
+				</tbody>
+			</table>
+			
+			
+			
+		</div>
+	</div>
+
 </body>
 </html>

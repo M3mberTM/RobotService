@@ -11,6 +11,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import data.*;
@@ -18,7 +19,7 @@ import data.*;
 @Path("/lego")
 public class LegoService {
 	EntityManagerFactory emf=Persistence.createEntityManagerFactory("lego");	
-	
+	boolean isKilled = false;
 	@Path("/test")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
@@ -37,6 +38,38 @@ public class LegoService {
 		return l;
 	}
 	
+	
+	@Path("/settimestamp/{par}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Laptime setTimestamp(@PathParam("par") int timestamp) {
+		Laptime lt = new Laptime();
+		lt.setTimetaken(timestamp);
+		System.out.println(lt);
+	    EntityManager em=emf.createEntityManager();
+	    em.getTransaction().begin();
+	    em.merge(lt);
+	    em.getTransaction().commit();		
+		return lt;
+		
+
+	}
+	
+	@Path("/gettimestamps")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Laptime> getTimestamps() {
+		EntityManager em=emf.createEntityManager();
+	    em.getTransaction().begin();
+		Query q=em.createQuery("select s from Laptime s order by s.id desc");
+		List<Laptime> list=q.getResultList();
+		em.getTransaction().commit();
+
+		return list;
+	}
+	
+	
+	
 	@Path("/setvalues")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -49,6 +82,39 @@ public class LegoService {
 	    em.getTransaction().commit();		
 		return ls;
 	}
+	
+	
+	
+	@Path("/getkill")
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getKill() {
+		EntityManager em=emf.createEntityManager();
+	    em.getTransaction().begin();
+		Query q=em.createQuery("select s from Killswitch s order by s.id desc").setMaxResults(1);
+		List<Killswitch> list=q.getResultList();
+		em.getTransaction().commit();
+		Killswitch currSetting = list.get(0);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(currSetting.getKillswitch());
+		return sb.toString();
+	}
+	
+	@Path("/setkill")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Killswitch setKill(Killswitch ks) {
+		System.out.println(ks);
+	    EntityManager em=emf.createEntityManager();
+	    em.getTransaction().begin();
+	    em.merge(ks);
+	    em.getTransaction().commit();		
+		return ks;
+	}
+	
+	
 	@Path("/getvalues")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
@@ -79,7 +145,7 @@ public class LegoService {
 	public List getAllValues() {
 	    EntityManager em=emf.createEntityManager();
 	    em.getTransaction().begin();
-		Query q=em.createQuery("select s from LegoSetting s order by s.id desc");
+		Query q=em.createQuery("select s from LegoSetting s order by s.id desc").setMaxResults(10);
 		List<LegoSetting> list=q.getResultList();
 		em.getTransaction().commit();		
 		return list;
