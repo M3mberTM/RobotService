@@ -7,7 +7,7 @@ This repository contains the source code for our Java RESTful web service design
 
 * Hongqian Li - Initial work - [HongqianLi](https://github.com/hongqian-li)
 * Richard Švajdlenka - Main functionality - [Richard](https://github.com/M3mberTM)
-* Julian Hack - System Testing - [JulianHack](https://github.com/Julian23000)
+* Julian Hack - Researcher and debugger - [JulianHack](https://github.com/Julian23000)
 * Attila Vegh - Backend Development - [AttilaVegh](https://github.com/Attila22000)
 
 ### Richard
