@@ -1,0 +1,11 @@
+##############################################################
+#
+# List of approvers/reviewers for RobotService
+#
+##############################################################
+
+
+# These owners will be the default owners for everything in the repo.
+* @M3mberTM
+RobotService/src/main/java/* @M3mberTM @hongqian-li
+RobotService/src/main/webapp/* @Julian23000 @Attila22000
