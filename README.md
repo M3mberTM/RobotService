@@ -21,4 +21,4 @@ I have done contributions to the project as followed. Firstly I have done resear
 Worked on the main code development of the project, including both the server and client side (Robot service as well as the Robot). Created the main functionality for the server side (functions) as well as the earlier formatting for the index.html.
 
 ### Attila
-Worked on the look of the webservice design, helped with the integration of the server into the Lego robots functionality(reading and sending data through the server into the database) as well as creating the database and its tables. 
+Worked on the look of the webservice design, helped with the integration of the server into the Lego robots functionality(reading and sending data through the server into the database) as well as creating the database and its tables. Also did research on the hardware of the robot and handled it(assembly). 
